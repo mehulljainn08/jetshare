@@ -37,8 +37,12 @@ cd jetshare
 
 
 # Build backend
+# Build backend
 echo "Building JetShare backend..."
+cd p2p
 mvn clean package
+cd ..
+
 
 # Build frontend
 echo "Building frontend..."
