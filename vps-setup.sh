@@ -30,10 +30,11 @@ echo "Installing Maven..."
 sudo apt install -y maven
 
 # Clone the repository
-if [ ! -d "jetshare/.git" ]; then
-  git clone https://github.com/mehulljainn08/jetshare.git
+if [ ! -d "$HOME/jetshare/.git" ]; then
+  git clone https://github.com/mehulljainn08/jetshare.git $HOME/jetshare
 fi
-cd jetshare
+cd $HOME/jetshare
+
 
 # Build backend
 echo "Building JetShare backend..."
