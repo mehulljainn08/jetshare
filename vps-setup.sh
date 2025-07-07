@@ -35,19 +35,21 @@ if [ ! -d "jetshare/.git" ]; then
 fi
 cd jetshare
 
-
-# Build backend
 # Build backend
 echo "Building JetShare backend..."
 cd p2p
 mvn clean package
 cd ..
 
-
 # Build frontend
 echo "Building frontend..."
 cd ui
-npm install
+
+# Optional: skip npm install if already done
+if [ ! -d "node_modules" ]; then
+  npm install
+fi
+
 npm run build
 cd ..
 
@@ -101,6 +103,7 @@ sudo ln -sf /etc/nginx/sites-available/jetshare /etc/nginx/sites-enabled/jetshar
 sudo nginx -t
 if [ $? -eq 0 ]; then
     sudo systemctl restart nginx
+    sudo systemctl enable nginx
     echo "Nginx restarted with new configuration."
 else
     echo "Nginx configuration is invalid. Exiting..."
@@ -109,7 +112,8 @@ fi
 
 # Start backend with PM2
 echo "Starting JetShare backend with PM2..."
-JAR_FILE=$(find target -name "*.jar" | head -n 1)
+JAR_FILE=$(find p2p/target -name "*-shaded.jar" | head -n 1)
+pm2 delete jetshare-backend || true
 pm2 start --name jetshare-backend java -- -jar "$JAR_FILE"
 
 # Save PM2 processes and setup startup
@@ -119,7 +123,7 @@ sudo su -c "env PATH=\$PATH:/usr/bin pm2 startup systemd -u ubuntu --hp /home/ub
 
 echo ""
 echo "✅ JetShare VPS setup completed successfully!"
-echo "Backend running on http://$SERVER_NAME/api/"
-echo "Frontend running on http://$SERVER_NAME/"
-
+echo "📦 Backend running on http://$SERVER_NAME/api/"
+echo "🌐 Frontend running on http://$SERVER_NAME/"
+echo "🛠️  To monitor logs: pm2 logs"
 
