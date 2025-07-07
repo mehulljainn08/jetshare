@@ -61,7 +61,7 @@ if [ -f /etc/nginx/sites-enabled/default ]; then
 fi
 
 # Replace this with your actual domain or IP
-SERVER_NAME="13.204.54.245"
+SERVER_NAME="13.235.40.111"
 
 # Create Nginx config for JetShare
 echo "Creating Nginx configuration for JetShare..."
