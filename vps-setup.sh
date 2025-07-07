@@ -30,11 +30,10 @@ echo "Installing Maven..."
 sudo apt install -y maven
 
 # Clone the repository
-if [ ! -d "$HOME/jetshare/.git" ]; then
-  git clone https://github.com/mehulljainn08/jetshare.git $HOME/jetshare
+if [ ! -d "jetshare/.git" ]; then
+  git clone https://github.com/mehulljainn08/jetshare.git
 fi
-cd $HOME/jetshare
-
+cd jetshare
 
 # Build backend
 echo "Building JetShare backend..."
@@ -45,16 +44,11 @@ cd ..
 # Build frontend
 echo "Building frontend..."
 cd ui
-
-# Optional: skip npm install if already done
-if [ ! -d "node_modules" ]; then
-  npm install
-fi
-
+npm install
 npm run build
 cd ..
 
-# Serve frontend using Nginx (static build)
+# Serve frontend using Nginx
 echo "Configuring Nginx..."
 
 # Remove default Nginx config if it exists
@@ -63,10 +57,9 @@ if [ -f /etc/nginx/sites-enabled/default ]; then
     echo "Default Nginx configuration removed."
 fi
 
-# Replace this with your actual domain or IP
 SERVER_NAME="13.235.40.111"
 
-# Create Nginx config for JetShare
+# Create Nginx config
 echo "Creating Nginx configuration for JetShare..."
 cat <<EOF | sudo tee /etc/nginx/sites-available/jetshare
 server {
@@ -104,7 +97,6 @@ sudo ln -sf /etc/nginx/sites-available/jetshare /etc/nginx/sites-enabled/jetshar
 sudo nginx -t
 if [ $? -eq 0 ]; then
     sudo systemctl restart nginx
-    sudo systemctl enable nginx
     echo "Nginx restarted with new configuration."
 else
     echo "Nginx configuration is invalid. Exiting..."
@@ -113,9 +105,11 @@ fi
 
 # Start backend with PM2
 echo "Starting JetShare backend with PM2..."
-JAR_FILE=$(find p2p/target -name "*-shaded.jar" | head -n 1)
+cd p2p
+JAR_FILE=$(find target -name "*shaded.jar" | head -n 1)
 pm2 delete jetshare-backend || true
 pm2 start --name jetshare-backend java -- -jar "$JAR_FILE"
+cd ..
 
 # Save PM2 processes and setup startup
 echo "Saving PM2 processes and enabling startup on boot..."
